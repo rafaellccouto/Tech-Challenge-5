@@ -1,0 +1,19 @@
+# Ambiente virtual
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Artefatos locais e arquivos de apoio
+*.pkl
+*.log
+*.sqlite3
+
+# Scripts e notebooks antigos do processo
+*.py
+*.ipynb
+!pipeline_datathon_passos_magicos.ipynb
+execution_log.txt
+
+# Pasta de dados local (mantida no repositório conforme requisito do projeto)
+# Dados_Base/
