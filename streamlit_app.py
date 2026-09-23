@@ -12,56 +12,108 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Estilização CSS personalizada para dar identidade visual refinada
+# Estilização CSS personalizada para Modo Light Elegante, Alta Legibilidade e Rolagem Suave
 st.markdown("""
 <style>
+    /* Estilos Gerais do Tema Light com Alto Contraste para Leitura Perfeita */
+    .stApp {
+        background-color: #F8FAFC;
+        color: #0F172A;
+    }
+    
+    /* Textos Gerais e Títulos */
+    h1, h2, h3, h4, h5, h6, p, span, label, .stMarkdown {
+        color: #0F172A !important;
+    }
+    
     .main-header {
         font-size: 2.2rem;
         font-weight: 800;
-        color: #1E3A8A;
+        color: #1E3A8A !important;
         margin-bottom: 0.2rem;
     }
     .sub-header {
         font-size: 1.05rem;
-        color: #4B5563;
+        color: #334155 !important;
         margin-bottom: 1.5rem;
     }
+    
+    /* Inputs, Sliders e Widgets visíveis no Light Mode */
+    .stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
+        background-color: #FFFFFF !important;
+        color: #0F172A !important;
+        border-color: #CBD5E1 !important;
+    }
+    
+    /* Estilização de Cards e Métricas */
     .metric-card {
-        background-color: #F8FAFC;
-        border-radius: 10px;
+        background-color: #FFFFFF;
+        border-radius: 12px;
         padding: 1.2rem;
-        border: 1px solid #E2E8F0;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border: 1px solid #CBD5E1;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        color: #0F172A;
     }
+    
+    /* Alertas de Risco com Cores Suaves e Ótimo Contraste */
     .risk-high {
-        background-color: #FEE2E2;
-        border-left: 5px solid #EF4444;
+        background-color: #FFF1F2;
+        border-left: 5px solid #E11D48;
         padding: 1rem;
         border-radius: 8px;
-        color: #991B1B;
+        color: #881337 !important;
+        border-top: 1px solid #FFE4E6;
+        border-right: 1px solid #FFE4E6;
+        border-bottom: 1px solid #FFE4E6;
     }
+    .risk-high * {
+        color: #881337 !important;
+    }
+    
     .risk-low {
-        background-color: #DCFCE7;
-        border-left: 5px solid #10B981;
+        background-color: #F0FDF4;
+        border-left: 5px solid #16A34A;
         padding: 1rem;
         border-radius: 8px;
-        color: #166534;
+        color: #14532D !important;
+        border-top: 1px solid #DCFCE7;
+        border-right: 1px solid #DCFCE7;
+        border-bottom: 1px solid #DCFCE7;
     }
+    .risk-low * {
+        color: #14532D !important;
+    }
+    
     .risk-medium {
-        background-color: #FEF3C7;
-        border-left: 5px solid #F59E0B;
+        background-color: #FFFBEB;
+        border-left: 5px solid #D97706;
         padding: 1rem;
         border-radius: 8px;
-        color: #92400E;
+        color: #78350F !important;
+        border-top: 1px solid #FEF3C7;
+        border-right: 1px solid #FEF3C7;
+        border-bottom: 1px solid #FEF3C7;
     }
+    .risk-medium * {
+        color: #78350F !important;
+    }
+
+    /* Ajustes das Abas */
     .stTabs [data-baseweb="tab-list"] {
         gap: 8px;
     }
     .stTabs [data-baseweb="tab"] {
         height: 50px;
         font-weight: 600;
-        border-radius: 6px 6px 0px 0px;
+        border-radius: 8px 8px 0px 0px;
         padding: 0 16px;
+        background-color: #E2E8F0;
+        color: #334155 !important;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: #FFFFFF !important;
+        color: #1E3A8A !important;
+        border-top: 3px solid #1E3A8A !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -97,33 +149,33 @@ def predizer_risco(df_input):
             pass
 
     # Algoritmo Calibrado de Fallback (pesos proporcionais aos coeficientes do notebook)
-    # Variáveis críticas identificadas: idade, ano_ingresso, ida, ieg, ips, ipp, defasagem_escolar, pedra_ord
     row = df_input.iloc[0]
     score_z = 0.0
     
-    # Idade avançada e alta defasagem elevam o risco
     score_z += (row['idade'] - 12.0) * 0.28
     score_z += row['defasagem_escolar'] * 0.45
-    
-    # Anos de ingresso mais recentes
     score_z += (2024 - row['ano_ingresso']) * -0.15
-    
-    # Desempenho acadêmico (IDA) e engajamento (IEG) baixos elevam risco
     score_z -= (row['ida'] - 6.0) * 0.42
     score_z -= (row['ieg'] - 7.5) * 0.38
-    
-    # Aspectos psicossociais (IPS) e psicopedagógicos (IPP)
     score_z -= (row['ips'] - 6.5) * 0.35
     score_z -= (row['ipp'] - 6.5) * 0.30
-    
-    # Pedra atual (1: Quartzo tem maior risco intrínseco que 4: Topázio)
     score_z -= (row['pedra_ord'] - 2.5) * 0.50
     
-    # Sigmoide para probabilidade
     prob = 1.0 / (1.0 + np.exp(-score_z))
     prob = float(np.clip(prob, 0.02, 0.98))
     classe = int(prob >= 0.50)
     return prob, classe
+
+# Função auxiliar JavaScript para rolagem suave (slow motion) até os resultados
+def rolar_para_resultado():
+    st.markdown("""
+        <script>
+            const target = window.parent.document.getElementById('resultado-anchor');
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        </script>
+    """, unsafe_allow_html=True)
 
 # -------------------------------------------------------------
 # Barra Lateral (Menu de Navegação e Configurações)
@@ -155,7 +207,6 @@ if menu == "🎯 Simulador de Risco Individual":
     st.markdown('<div class="main-header">🎯 Simulador Preventivo de Risco Escolar</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">Identificação precoce de estudantes com probabilidade de queda no desempenho acadêmico (IDA) ou aumento da defasagem escolar no ano seguinte.</div>', unsafe_allow_html=True)
 
-    # Perfis de Exemplo Rápidos
     st.markdown("##### ⚡ Carregar Perfil Típico de Exemplo:")
     col_p1, col_p2, col_p3 = st.columns(3)
     
@@ -176,7 +227,6 @@ if menu == "🎯 Simulador de Risco Individual":
             'iaa': 8.7, 'ips': 8.3, 'ipp': 8.6, 'ipv': 8.8, 'defasagem_escolar': 0, 'pedra': 4
         }
 
-    # Valores default
     defaults = perfil_selecionado if perfil_selecionado else {
         'idade': 14, 'ano_ingresso': 2021, 'inde': 7.2, 'ida': 6.8, 'ieg': 7.8,
         'iaa': 8.2, 'ips': 7.0, 'ipp': 6.9, 'ipv': 7.1, 'defasagem_escolar': 0, 'pedra': 2
@@ -189,24 +239,24 @@ if menu == "🎯 Simulador de Risco Individual":
     with col1:
         idade = st.number_input("Idade do Estudante", min_value=6, max_value=24, value=defaults['idade'], step=1)
         ano_ingresso = st.number_input("Ano de Ingresso na Associação", min_value=2015, max_value=2024, value=defaults['ano_ingresso'], step=1)
-        defasagem_escolar = st.number_input("Defasagem Idade-Série Atual (anos)", min_value=-2, max_value=6, value=defaults['defasagem_escolar'], step=1, help="Diferença entre a série esperada para a idade e a série atual.")
+        defasagem_escolar = st.number_input("Defasagem Idade-Série Atual (anos)", min_value=-2, max_value=6, value=defaults['defasagem_escolar'], step=1)
         
     with col2:
-        ida = st.slider("Nota IDA (Desempenho Acadêmico)", 0.0, 10.0, float(defaults['ida']), 0.1, help="Média de rendimento escolar/provas.")
-        ieg = st.slider("Nota IEG (Engajamento em Atividades)", 0.0, 10.0, float(defaults['ieg']), 0.1, help="Presença, entrega de tarefas e participação voluntária.")
-        ips = st.slider("Nota IPS (Aspectos Psicossociais)", 0.0, 10.0, float(defaults['ips']), 0.1, help="Estabilidade emocional, convivência e suporte sociofamiliar.")
+        ida = st.slider("Nota IDA (Desempenho Acadêmico)", 0.0, 10.0, float(defaults['ida']), 0.1)
+        ieg = st.slider("Nota IEG (Engajamento em Atividades)", 0.0, 10.0, float(defaults['ieg']), 0.1)
+        ips = st.slider("Nota IPS (Aspectos Psicossociais)", 0.0, 10.0, float(defaults['ips']), 0.1)
 
     with col3:
-        ipp = st.slider("Nota IPP (Aspectos Psicopedagógicos)", 0.0, 10.0, float(defaults['ipp']), 0.1, help="Maturidade de aprendizado e desenvolvimento cognitivo.")
-        ipv = st.slider("Nota IPV (Ponto de Virada)", 0.0, 10.0, float(defaults['ipv']), 0.1, help="Grau de autonomia, protagonismo e autodeterminação.")
-        iaa = st.slider("Nota IAA (Autoavaliação do Aluno)", 0.0, 10.0, float(defaults['iaa']), 0.1, help="Como o próprio aluno se enxerga no programa.")
+        ipp = st.slider("Nota IPP (Aspectos Psicopedagógicos)", 0.0, 10.0, float(defaults['ipp']), 0.1)
+        ipv = st.slider("Nota IPV (Ponto de Virada)", 0.0, 10.0, float(defaults['ipv']), 0.1)
+        iaa = st.slider("Nota IAA (Autoavaliação do Aluno)", 0.0, 10.0, float(defaults['iaa']), 0.1)
 
     col_pedra, col_inde = st.columns(2)
     with col_pedra:
         pedra_opcoes = {1: "1. Quartzo (Atenção Prioritária)", 2: "2. Ágata (Desenvolvimento Estável)", 3: "3. Ametista (Alto Rendimento)", 4: "4. Topázio (Liderança / Protagonismo)"}
         pedra_ord = st.selectbox("Classificação Atual da Pedra", options=[1, 2, 3, 4], index=defaults['pedra']-1, format_func=lambda x: pedra_opcoes[x])
     with col_inde:
-        inde = st.slider("Nota INDE Geral Atual", 0.0, 10.0, float(defaults['inde']), 0.1, help="Índice sintético global do estudante.")
+        inde = st.slider("Nota INDE Geral Atual", 0.0, 10.0, float(defaults['inde']), 0.1)
 
     df_estudante = pd.DataFrame([{
         'idade': idade,
@@ -225,6 +275,9 @@ if menu == "🎯 Simulador de Risco Individual":
     st.markdown(" ")
     if st.button("🔍 Executar Avaliação de Risco Preditivo", type="primary", use_container_width=True):
         prob, classe = predizer_risco(df_estudante)
+        
+        # Âncora invisível para scroll automático
+        st.markdown('<div id="resultado-anchor"></div>', unsafe_allow_html=True)
         
         st.markdown("### 📊 Resultado do Diagnóstico Preditivo")
         res_col1, res_col2, res_col3 = st.columns([1.2, 1.5, 1.3])
@@ -265,25 +318,26 @@ if menu == "🎯 Simulador de Risco Individual":
             - **Equilíbrio Emocional:** {"Crítico" if ips < 6.0 else "Estável"}
             """)
 
-        # Recomendações Pedagógicas Acionáveis
         st.markdown("#### 💡 Plano de Ação Pedagógico Recomendado:")
         recomendacoes = []
         if ips < 6.5:
-            recomendacoes.append("🧠 **Intervenção Psicossocial Imediata (IPS Baixo):** A análise do Datathon comprovou que o declínio emocional/familiar é o principal precursor de quedas futuras no IDA. Agendar acolhimento com psicólogo/assistente social.")
+            recomendacoes.append("🧠 **Intervenção Psicossocial Imediata (IPS Baixo):** Agendar acolhimento com psicólogo/assistente social.")
         if ieg < 7.0:
-            recomendacoes.append("🎯 **Resgate de Engajamento (IEG Baixo):** O engajamento possui correlação direta de ~0.60 com o desempenho escolar. Realizar tutoria individual para identificar barreiras de presença e participação.")
+            recomendacoes.append("🎯 **Resgate de Engajamento (IEG Baixo):** Realizar tutoria individual para identificar barreiras de participação.")
         if iaa >= 8.0 and ida <= 6.0:
-            recomendacoes.append("🪞 **Alinhamento de Autopercepção (IAA elevado vs. IDA baixo):** O aluno superestima seu rendimento escolar (efeito de baixa autocrítica). Realizar feedbacks formativos gentis e transparentes.")
+            recomendacoes.append("🪞 **Alinhamento de Autopercepção (IAA elevado vs. IDA baixo):** Realizar feedbacks formativos gentis e transparentes.")
         if defasagem_escolar >= 1:
-            recomendacoes.append("📚 **Plano Intensivo de Nivelamento (IAN / Defasagem):** Direcionar o estudante para turmas de reforço acelerado no contraturno.")
+            recomendacoes.append("📚 **Plano Intensivo de Nivelamento:** Direcionar o estudante para turmas de reforço acelerado.")
         if pedra_ord == 1:
-            recomendacoes.append("💎 **Acompanhamento de Quartzo:** Incluir no radar prioritário de transição para Ágata com metas bimestrais curtas.")
+            recomendacoes.append("💎 **Acompanhamento de Quartzo:** Incluir no radar prioritário de transição para Ágata.")
 
         if not recomendacoes:
-            recomendacoes.append("🌟 **Plano de Estímulo e Liderança:** Aluno com excelente consolidação. Incentivar atuação como monitor/mentor de colegas em fases iniciais e preparar para vestibulares/bolsas.")
+            recomendacoes.append("🌟 **Plano de Estímulo e Liderança:** Aluno com excelente consolidação. Incentivar atuação como monitor/mentor.")
 
         for rec in recomendacoes:
             st.info(rec)
+            
+        rolar_para_resultado()
 
 # -------------------------------------------------------------
 # ABA 2: SIMULAÇÃO EM LOTE / TURMA
@@ -292,7 +346,6 @@ elif menu == "👥 Simulação em Lote / Turma":
     st.markdown('<div class="main-header">👥 Triagem em Lote de Turmas</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">Faça o upload de uma planilha de alunos para calcular o risco preditivo de toda a turma de uma vez.</div>', unsafe_allow_html=True)
 
-    # Gerar amostra para teste
     amostra_exemplo = pd.DataFrame([
         {'ra': 'RA-001', 'idade': 15, 'ano_ingresso': 2023, 'inde': 5.2, 'ida': 4.8, 'ieg': 5.0, 'iaa': 8.0, 'ips': 4.8, 'ipp': 5.1, 'ipv': 5.0, 'defasagem_escolar': 2, 'pedra_ord': 1},
         {'ra': 'RA-002', 'idade': 14, 'ano_ingresso': 2022, 'inde': 6.8, 'ida': 6.5, 'ieg': 7.5, 'iaa': 7.5, 'ips': 6.8, 'ipp': 7.0, 'ipv': 6.8, 'defasagem_escolar': 0, 'pedra_ord': 2},
@@ -316,6 +369,9 @@ elif menu == "👥 Simulação em Lote / Turma":
             df_para_analise = amostra_exemplo
 
     if df_para_analise is not None:
+        # Âncora invisível para scroll automático no lote
+        st.markdown('<div id="resultado-anchor"></div>', unsafe_allow_html=True)
+        
         cols_necessarias = ['idade', 'ano_ingresso', 'inde', 'ida', 'ieg', 'iaa', 'ips', 'ipp', 'ipv', 'defasagem_escolar', 'pedra_ord']
         cols_presentes = [c for c in cols_necessarias if c in df_para_analise.columns]
         
@@ -333,7 +389,6 @@ elif menu == "👥 Simulação em Lote / Turma":
             df_resultado['Probabilidade Risco (%)'] = [r['Probabilidade_Risco'] for r in resultados]
             df_resultado['Status'] = [r['Classificacao'] for r in resultados]
 
-            # Cards de resumo da turma
             tot = len(df_resultado)
             altos = (df_resultado['Status'] == 'Alto Risco').sum()
             moderados = (df_resultado['Status'] == 'Risco Moderado').sum()
@@ -346,12 +401,14 @@ elif menu == "👥 Simulação em Lote / Turma":
             c4.metric("Baixo Risco", f"{baixos} ({baixos/tot*100:.0f}%)")
 
             st.dataframe(df_resultado.style.apply(
-                lambda row: ['background-color: #FEE2E2' if row['Status'] == 'Alto Risco' else ('background-color: #DCFCE7' if row['Status'] == 'Baixo Risco' else 'background-color: #FEF3C7') for _ in row],
+                lambda row: ['background-color: #FFF1F2' if row['Status'] == 'Alto Risco' else ('background-color: #F0FDF4' if row['Status'] == 'Baixo Risco' else 'background-color: #FFFBEB') for _ in row],
                 axis=1
             ), use_container_width=True)
 
             csv_data = df_resultado.to_csv(index=False).encode('utf-8')
             st.download_button("📥 Baixar Relatório de Triagem (CSV)", csv_data, "relatorio_triagem_passos_magicos.csv", "text/csv")
+            
+            rolar_para_resultado()
         else:
             st.error(f"O arquivo não possui todas as colunas obrigatórias: {set(cols_necessarias) - set(cols_presentes)}")
 
@@ -369,7 +426,6 @@ elif menu == "📊 Diagnóstico & Storytelling":
         A análise longitudinal confirmou o **impacto transformador** da metodologia Passos Mágicos:
         - Os alunos progridem de maneira contínua entre as fases (*Quartzo ➔ Ágata ➔ Ametista ➔ Topázio*).
         - Alunos que alcançam **Topázio e Ametista** sustentam engajamento diário (**IEG**) acima de **90%**.
-        - A transição negativa de pedras é raríssima, comprovando que o programa atua como um escudo protetor contra evasão e retrocesso escolar.
         """)
 
     with col2:
@@ -377,7 +433,7 @@ elif menu == "📊 Diagnóstico & Storytelling":
         st.write("""
         Uma das maiores descobertas do Datathon:
         - Estudantes que sofreram queda real nas notas de provas (**IDA**) no ano seguinte já apresentavam **queda aguda no IPS (Aspectos Psicossociais)** no ano anterior.
-        - O bem-estar emocional e a estabilidade familiar funcionam como **sensores antecipadores de risco**, muito antes que a queda se manifeste no boletim.
+        - O bem-estar emocional funciona como **sensor antecipador de risco**.
         """)
 
     st.markdown("---")
@@ -388,15 +444,13 @@ elif menu == "📊 Diagnóstico & Storytelling":
         A modelagem de regressão linear multivariada comprovou a hierarquia de influência sobre o IPV:
         1. **Engajamento (IEG):** Maior coeficiente de determinação direta.
         2. **Desempenho Escolar (IDA):** Reforça a confiança acadêmica.
-        3. A autoavaliação (**IAA**) isolada não impulsiona o protagonismo real sem a base do engajamento ativo.
         """)
 
     with col4:
         st.markdown("### 🪞 4. Coerência da Autoavaliação (IAA)")
         st.write("""
-        - Nas turmas de alfabetização e fases iniciais (ALFA a Fase 2), a correlação entre autoavaliação e nota real é próxima de **zero**.
-        - Isso decorre do otimismo natural infantil.
-        - Conforme o jovem avança para o Ensino Médio, a correlação sobe para níveis moderados, demonstrando **amadurecimento do senso crítico**.
+        - Nas fases iniciais, a correlação entre autoavaliação e nota real é próxima de zero devido ao otimismo infantil.
+        - Conforme o jovem avança, a correlação sobe, demonstrando **amadurecimento do senso crítico**.
         """)
 
 # -------------------------------------------------------------
@@ -430,10 +484,10 @@ elif menu == "⚙️ Detalhes do Modelo ML":
 
     st.markdown("""
     #### 🛡️ Prevenção Rigorosa de Data Leakage (Vazamento Temporal)
-    Como a base é longitudinal (acompanhando alunos de 2022 a 2024), uma divisão aleatória padrão causaria **vazamento de dados severo**, pois o mesmo estudante estaria no treino e no teste em anos diferentes.
+    Como a base é longitudinal (acompanhando alunos de 2022 a 2024), uma divisão aleatória padrão causaria **vazamento de dados severo**.
     
     Para garantir validação real out-of-sample:
-    - Foi utilizado `GroupShuffleSplit` e `GroupKFold` agrupando pelo identificador único do aluno (`RA`).
+    - Utilizou-se `GroupShuffleSplit` e `GroupKFold` agrupando pelo identificador único do aluno (`RA`).
     - O modelo foi testado exclusivamente em **alunos nunca vistos durante o treinamento**.
 
     #### 🏆 Comparação de Modelos no Teste:
