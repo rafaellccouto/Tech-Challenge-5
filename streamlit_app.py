@@ -18,12 +18,12 @@ st.markdown("""
     /* Estilos Gerais do Tema Light com Alto Contraste para Leitura Perfeita */
     .stApp {
         background-color: #F8FAFC;
-        color: #0F172A;
+        color: #0B0F19;
     }
     
-    /* Textos Gerais e Títulos */
-    h1, h2, h3, h4, h5, h6, p, span, label, .stMarkdown {
-        color: #0F172A !important;
+    /* Textos Gerais, Títulos e Labels */
+    h1, h2, h3, h4, h5, h6, p, span, label, .stMarkdown, .stRadio label, .stCheckbox label {
+        color: #0B0F19 !important;
     }
     
     .main-header {
@@ -34,15 +34,22 @@ st.markdown("""
     }
     .sub-header {
         font-size: 1.05rem;
-        color: #334155 !important;
+        color: #1E293B !important;
         margin-bottom: 1.5rem;
     }
     
-    /* Inputs, Sliders e Widgets visíveis no Light Mode */
+    /* Inputs, Sliders e Widgets visíveis e legíveis no Light Mode */
     .stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
         background-color: #FFFFFF !important;
-        color: #0F172A !important;
-        border-color: #CBD5E1 !important;
+        color: #0B0F19 !important;
+        border-color: #94A3B8 !important;
+        font-weight: 500;
+    }
+
+    /* Rótulos dos Sliders e Number Inputs com alta visibilidade */
+    .stSlider label, .stNumberInput label, .stSelectbox label, .stFileUploader label {
+        color: #0B0F19 !important;
+        font-weight: 600 !important;
     }
     
     /* Estilização de Cards e Métricas */
@@ -52,7 +59,7 @@ st.markdown("""
         padding: 1.2rem;
         border: 1px solid #CBD5E1;
         box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-        color: #0F172A;
+        color: #0B0F19;
     }
     
     /* Alertas de Risco com Cores Suaves e Ótimo Contraste */
@@ -108,7 +115,7 @@ st.markdown("""
         border-radius: 8px 8px 0px 0px;
         padding: 0 16px;
         background-color: #E2E8F0;
-        color: #334155 !important;
+        color: #1E293B !important;
     }
     .stTabs [aria-selected="true"] {
         background-color: #FFFFFF !important;
@@ -166,14 +173,16 @@ def predizer_risco(df_input):
     classe = int(prob >= 0.50)
     return prob, classe
 
-# Função auxiliar JavaScript para rolagem suave (slow motion) até os resultados
+# Função auxiliar JavaScript para rolagem suave em slow motion até os resultados
 def rolar_para_resultado():
     st.markdown("""
         <script>
-            const target = window.parent.document.getElementById('resultado-anchor');
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+            setTimeout(function() {
+                const target = window.parent.document.getElementById('resultado-anchor');
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
         </script>
     """, unsafe_allow_html=True)
 
@@ -182,46 +191,46 @@ def rolar_para_resultado():
 # -------------------------------------------------------------
 with st.sidebar:
     st.image("https://passosmagicos.org.br/wp-content/uploads/2020/10/logo-passos-magicos.png", width=190)
-    st.markdown("### 🧭 Navegação")
+    st.markdown("### Navegação")
     menu = st.radio(
         "Selecione uma área:",
         [
-            "🎯 Simulador de Risco Individual",
-            "👥 Simulação em Lote / Turma",
-            "📊 Diagnóstico & Storytelling",
-            "📖 Dicionário de Indicadores",
-            "⚙️ Detalhes do Modelo ML"
+            "Simulador de Risco Individual",
+            "Simulação em Lote / Turma",
+            "Diagnóstico e Storytelling",
+            "Dicionário de Indicadores",
+            "Detalhes do Modelo ML"
         ]
     )
     st.markdown("---")
     if modo_modelo == "pkl":
-        st.success("✅ Modelo Serializado Ativo (`.pkl`)")
+        st.success("Modelo Serializado Ativo (.pkl)")
     else:
-        st.info("ℹ️ Modelo Calibrado de Fallback Ativo")
+        st.info("Modelo Calibrado de Fallback Ativo")
     st.caption("Datathon Passos Mágicos — Pós Tech (Fase 5)")
 
 # -------------------------------------------------------------
 # ABA 1: SIMULADOR DE RISCO INDIVIDUAL
 # -------------------------------------------------------------
-if menu == "🎯 Simulador de Risco Individual":
-    st.markdown('<div class="main-header">🎯 Simulador Preventivo de Risco Escolar</div>', unsafe_allow_html=True)
+if menu == "Simulador de Risco Individual":
+    st.markdown('<div class="main-header">Simulador Preventivo de Risco Escolar</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">Identificação precoce de estudantes com probabilidade de queda no desempenho acadêmico (IDA) ou aumento da defasagem escolar no ano seguinte.</div>', unsafe_allow_html=True)
 
-    st.markdown("##### ⚡ Carregar Perfil Típico de Exemplo:")
+    st.markdown("##### Carregar Perfil Típico de Exemplo:")
     col_p1, col_p2, col_p3 = st.columns(3)
     
     perfil_selecionado = None
-    if col_p1.button("🔴 Aluno Quartzo (Alta Vulnerabilidade)"):
+    if col_p1.button("Aluno Quartzo (Alta Vulnerabilidade)"):
         perfil_selecionado = {
             'idade': 15, 'ano_ingresso': 2023, 'inde': 5.2, 'ida': 4.8, 'ieg': 5.1,
             'iaa': 8.0, 'ips': 4.9, 'ipp': 5.0, 'ipv': 5.2, 'defasagem_escolar': 2, 'pedra': 1
         }
-    if col_p2.button("🟡 Aluno Ágata (Em Transição/Atenção)"):
+    if col_p2.button("Aluno Ágata (Em Transição/Atenção)"):
         perfil_selecionado = {
             'idade': 13, 'ano_ingresso': 2022, 'inde': 6.8, 'ida': 6.2, 'ieg': 7.4,
             'iaa': 7.8, 'ips': 6.5, 'ipp': 6.8, 'ipv': 6.5, 'defasagem_escolar': 0, 'pedra': 2
         }
-    if col_p3.button("🟢 Aluno Topázio (Protagonista/Estável)"):
+    if col_p3.button("Aluno Topázio (Protagonista/Estável)"):
         perfil_selecionado = {
             'idade': 12, 'ano_ingresso': 2020, 'inde': 8.9, 'ida': 8.5, 'ieg': 9.2,
             'iaa': 8.7, 'ips': 8.3, 'ipp': 8.6, 'ipv': 8.8, 'defasagem_escolar': 0, 'pedra': 4
@@ -233,7 +242,7 @@ if menu == "🎯 Simulador de Risco Individual":
     }
 
     st.markdown("---")
-    st.markdown("#### 📝 Dados Cadastrais e Indicadores do Aluno")
+    st.markdown("#### Dados Cadastrais e Indicadores do Aluno")
     
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -273,13 +282,13 @@ if menu == "🎯 Simulador de Risco Individual":
     }])
 
     st.markdown(" ")
-    if st.button("🔍 Executar Avaliação de Risco Preditivo", type="primary", use_container_width=True):
+    if st.button("Executar Avaliação de Risco Preditivo", type="primary", use_container_width=True):
         prob, classe = predizer_risco(df_estudante)
         
-        # Âncora invisível para scroll automático
+        # Âncora invisível para scroll automático em slow motion
         st.markdown('<div id="resultado-anchor"></div>', unsafe_allow_html=True)
         
-        st.markdown("### 📊 Resultado do Diagnóstico Preditivo")
+        st.markdown("### Resultado do Diagnóstico Preditivo")
         res_col1, res_col2, res_col3 = st.columns([1.2, 1.5, 1.3])
         
         with res_col1:
@@ -290,21 +299,21 @@ if menu == "🎯 Simulador de Risco Individual":
             if prob >= 0.65:
                 st.markdown("""
                 <div class="risk-high">
-                    <strong>🚨 ALTO RISCO DE DETERIORAÇÃO</strong><br>
+                    <strong>ALTO RISCO DE DETERIORAÇÃO</strong><br>
                     Forte probabilidade de queda no aproveitamento escolar ou aumento de defasagem no próximo ano.
                 </div>
                 """, unsafe_allow_html=True)
             elif prob >= 0.40:
                 st.markdown("""
                 <div class="risk-medium">
-                    <strong>⚠️ RISCO MODERADO (ATENÇÃO)</strong><br>
+                    <strong>RISCO MODERADO (ATENÇÃO)</strong><br>
                     Estudante em zona de alerta intermediária. Monitoramento preventivo recomendado.
                 </div>
                 """, unsafe_allow_html=True)
             else:
                 st.markdown("""
                 <div class="risk-low">
-                    <strong>✅ BAIXO RISCO (TRAJETÓRIA SEGURA)</strong><br>
+                    <strong>BAIXO RISCO (TRAJETÓRIA SEGURA)</strong><br>
                     Estudante consolidado, com alta probabilidade de manter ou evoluir seu nível pedagógico.
                 </div>
                 """, unsafe_allow_html=True)
@@ -318,21 +327,21 @@ if menu == "🎯 Simulador de Risco Individual":
             - **Equilíbrio Emocional:** {"Crítico" if ips < 6.0 else "Estável"}
             """)
 
-        st.markdown("#### 💡 Plano de Ação Pedagógico Recomendado:")
+        st.markdown("#### Plano de Ação Pedagógico Recomendado:")
         recomendacoes = []
         if ips < 6.5:
-            recomendacoes.append("🧠 **Intervenção Psicossocial Imediata (IPS Baixo):** Agendar acolhimento com psicólogo/assistente social.")
+            recomendacoes.append("Intervenção Psicossocial Imediata (IPS Baixo): Agendar acolhimento com psicólogo/assistente social.")
         if ieg < 7.0:
-            recomendacoes.append("🎯 **Resgate de Engajamento (IEG Baixo):** Realizar tutoria individual para identificar barreiras de participação.")
+            recomendacoes.append("Resgate de Engajamento (IEG Baixo): Realizar tutoria individual para identificar barreiras de participação.")
         if iaa >= 8.0 and ida <= 6.0:
-            recomendacoes.append("🪞 **Alinhamento de Autopercepção (IAA elevado vs. IDA baixo):** Realizar feedbacks formativos gentis e transparentes.")
+            recomendacoes.append("Alinhamento de Autopercepção (IAA elevado vs. IDA baixo): Realizar feedbacks formativos gentis e transparentes.")
         if defasagem_escolar >= 1:
-            recomendacoes.append("📚 **Plano Intensivo de Nivelamento:** Direcionar o estudante para turmas de reforço acelerado.")
+            recomendacoes.append("Plano Intensivo de Nivelamento: Direcionar o estudante para turmas de reforço acelerado.")
         if pedra_ord == 1:
-            recomendacoes.append("💎 **Acompanhamento de Quartzo:** Incluir no radar prioritário de transição para Ágata.")
+            recomendacoes.append("Acompanhamento de Quartzo: Incluir no radar prioritário de transição para Ágata.")
 
         if not recomendacoes:
-            recomendacoes.append("🌟 **Plano de Estímulo e Liderança:** Aluno com excelente consolidação. Incentivar atuação como monitor/mentor.")
+            recomendacoes.append("Plano de Estímulo e Liderança: Aluno com excelente consolidação. Incentivar atuação como monitor/mentor.")
 
         for rec in recomendacoes:
             st.info(rec)
@@ -342,8 +351,8 @@ if menu == "🎯 Simulador de Risco Individual":
 # -------------------------------------------------------------
 # ABA 2: SIMULAÇÃO EM LOTE / TURMA
 # -------------------------------------------------------------
-elif menu == "👥 Simulação em Lote / Turma":
-    st.markdown('<div class="main-header">👥 Triagem em Lote de Turmas</div>', unsafe_allow_html=True)
+elif menu == "Simulação em Lote / Turma":
+    st.markdown('<div class="main-header">Triagem em Lote de Turmas</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">Faça o upload de uma planilha de alunos para calcular o risco preditivo de toda a turma de uma vez.</div>', unsafe_allow_html=True)
 
     amostra_exemplo = pd.DataFrame([
@@ -354,7 +363,7 @@ elif menu == "👥 Simulação em Lote / Turma":
         {'ra': 'RA-005', 'idade': 13, 'ano_ingresso': 2022, 'inde': 7.3, 'ida': 7.0, 'ieg': 8.0, 'iaa': 8.0, 'ips': 7.2, 'ipp': 7.4, 'ipv': 7.3, 'defasagem_escolar': 0, 'pedra_ord': 3},
     ])
 
-    uploaded_file = st.file_uploader("📂 Envie um arquivo CSV com as notas dos alunos", type=["csv"])
+    uploaded_file = st.file_uploader("Envie um arquivo CSV com as notas dos alunos", type=["csv"])
 
     df_para_analise = None
     if uploaded_file is not None:
@@ -364,8 +373,8 @@ elif menu == "👥 Simulação em Lote / Turma":
         except Exception as e:
             st.error(f"Erro ao ler arquivo: {e}")
     else:
-        st.info("💡 Nenhum arquivo enviado. Você pode testar com a nossa base sintética de exemplo abaixo:")
-        if st.button("🧪 Carregar Dados de Exemplo (5 Alunos)"):
+        st.info("Nenhum arquivo enviado. Você pode testar com a nossa base sintética de exemplo abaixo:")
+        if st.button("Carregar Dados de Exemplo (5 Alunos)"):
             df_para_analise = amostra_exemplo
 
     if df_para_analise is not None:
@@ -406,7 +415,7 @@ elif menu == "👥 Simulação em Lote / Turma":
             ), use_container_width=True)
 
             csv_data = df_resultado.to_csv(index=False).encode('utf-8')
-            st.download_button("📥 Baixar Relatório de Triagem (CSV)", csv_data, "relatorio_triagem_passos_magicos.csv", "text/csv")
+            st.download_button("Baixar Relatório de Triagem (CSV)", csv_data, "relatorio_triagem_passos_magicos.csv", "text/csv")
             
             rolar_para_resultado()
         else:
@@ -415,13 +424,13 @@ elif menu == "👥 Simulação em Lote / Turma":
 # -------------------------------------------------------------
 # ABA 3: DIAGNÓSTICO E STORYTELLING
 # -------------------------------------------------------------
-elif menu == "📊 Diagnóstico & Storytelling":
-    st.markdown('<div class="main-header">📊 Storytelling & Principais Descobertas</div>', unsafe_allow_html=True)
+elif menu == "Diagnóstico e Storytelling":
+    st.markdown('<div class="main-header">Storytelling & Principais Descobertas</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">Síntese das principais evidências encontradas no estudo longitudinal (2022 a 2024).</div>', unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("### 💎 1. Efetividade Comprovada pelas Pedras")
+        st.markdown("### 1. Efetividade Comprovada pelas Pedras")
         st.write("""
         A análise longitudinal confirmou o **impacto transformador** da metodologia Passos Mágicos:
         - Os alunos progridem de maneira contínua entre as fases (*Quartzo ➔ Ágata ➔ Ametista ➔ Topázio*).
@@ -429,7 +438,7 @@ elif menu == "📊 Diagnóstico & Storytelling":
         """)
 
     with col2:
-        st.markdown("### 🧠 2. O Efeito Sensor do IPS (Emocional)")
+        st.markdown("### 2. O Efeito Sensor do IPS (Emocional)")
         st.write("""
         Uma das maiores descobertas do Datathon:
         - Estudantes que sofreram queda real nas notas de provas (**IDA**) no ano seguinte já apresentavam **queda aguda no IPS (Aspectos Psicossociais)** no ano anterior.
@@ -439,7 +448,7 @@ elif menu == "📊 Diagnóstico & Storytelling":
     st.markdown("---")
     col3, col4 = st.columns(2)
     with col3:
-        st.markdown("### ⚡ 3. O Motor do Ponto de Virada (IPV)")
+        st.markdown("### 3. O Motor do Ponto de Virada (IPV)")
         st.write("""
         A modelagem de regressão linear multivariada comprovou a hierarquia de influência sobre o IPV:
         1. **Engajamento (IEG):** Maior coeficiente de determinação direta.
@@ -447,7 +456,7 @@ elif menu == "📊 Diagnóstico & Storytelling":
         """)
 
     with col4:
-        st.markdown("### 🪞 4. Coerência da Autoavaliação (IAA)")
+        st.markdown("### 4. Coerência da Autoavaliação (IAA)")
         st.write("""
         - Nas fases iniciais, a correlação entre autoavaliação e nota real é próxima de zero devido ao otimismo infantil.
         - Conforme o jovem avança, a correlação sobe, demonstrando **amadurecimento do senso crítico**.
@@ -456,8 +465,8 @@ elif menu == "📊 Diagnóstico & Storytelling":
 # -------------------------------------------------------------
 # ABA 4: DICIONÁRIO DE INDICADORES
 # -------------------------------------------------------------
-elif menu == "📖 Dicionário de Indicadores":
-    st.markdown('<div class="main-header">📖 Dicionário de Indicadores Educacionais</div>', unsafe_allow_html=True)
+elif menu == "Dicionário de Indicadores":
+    st.markdown('<div class="main-header">Dicionário de Indicadores Educacionais</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">Métricas analíticas utilizadas no acompanhamento do desenvolvimento estudantil.</div>', unsafe_allow_html=True)
 
     indicadores = [
@@ -472,25 +481,25 @@ elif menu == "📖 Dicionário de Indicadores":
     ]
 
     for sigla, nome, desc in indicadores:
-        with st.expander(f"📌 **{sigla}** — {nome}"):
+        with st.expander(f"**{sigla}** — {nome}"):
             st.write(desc)
 
 # -------------------------------------------------------------
 # ABA 5: DETALHES DO MODELO ML
 # -------------------------------------------------------------
-elif menu == "⚙️ Detalhes do Modelo ML":
-    st.markdown('<div class="main-header">⚙️ Metodologia de Machine Learning</div>', unsafe_allow_html=True)
+elif menu == "Detalhes do Modelo ML":
+    st.markdown('<div class="main-header">Metodologia de Machine Learning</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">Critérios técnicos, prevenção de vazamento de dados e avaliação de performance.</div>', unsafe_allow_html=True)
 
     st.markdown("""
-    #### 🛡️ Prevenção Rigorosa de Data Leakage (Vazamento Temporal)
+    #### Prevenção Rigorosa de Data Leakage (Vazamento Temporal)
     Como a base é longitudinal (acompanhando alunos de 2022 a 2024), uma divisão aleatória padrão causaria **vazamento de dados severo**.
     
     Para garantir validação real out-of-sample:
     - Utilizou-se `GroupShuffleSplit` e `GroupKFold` agrupando pelo identificador único do aluno (`RA`).
     - O modelo foi testado exclusivamente em **alunos nunca vistos durante o treinamento**.
 
-    #### 🏆 Comparação de Modelos no Teste:
+    #### Comparação de Modelos no Teste:
     """)
 
     tabela_modelos = pd.DataFrame([
